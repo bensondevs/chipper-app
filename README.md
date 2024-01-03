@@ -10,9 +10,10 @@ Take some time to familiarize yourself with the codebase.
 
 1. Upload this code to a PRIVATE repository on GitHub. Invite the user [nicodevs](https://github.com/nicodevs/) to join the repository.
 
-   ![Image](https://i.imgur.com/wxemxjk.png)
+   ![Image](https://github.com/vueschool/chipper-app/assets/10015302/4f459c23-45fc-4bc6-becf-0b41d28d2b4b)
 
-2. Follow these steps to set up your local development environment:
+
+3. Follow these steps to set up your local development environment:
 
    - Start your Laravel application by running `php artisan serve`.
    - Navigate to the root of the Nuxt application.
