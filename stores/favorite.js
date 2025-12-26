@@ -3,6 +3,7 @@ export const useFavorite = defineStore('favorite', () => {
 
   const favoritedUserIds = ref(new Set())
   const togglingUserIds = ref(new Set())
+  const favoritedPostIds = ref(new Set())
 
   async function fetch () {
     try {
@@ -10,12 +11,15 @@ export const useFavorite = defineStore('favorite', () => {
       
       const favoritesData = response?.data || response
       const users = favoritesData?.users || []
+      const posts = favoritesData?.posts || []
       
       favoritedUserIds.value = new Set(users.map(user => user.id))
+      favoritedPostIds.value = new Set(posts.map(post => post.id))
       
       return favoritesData
     } catch (e) {
       favoritedUserIds.value = new Set()
+      favoritedPostIds.value = new Set()
       
       return {
         posts: [],
@@ -36,6 +40,10 @@ export const useFavorite = defineStore('favorite', () => {
     return favoritedUserIds.value.has(userId)
   }
   
+  function isPostFavorited (postId) {
+    return favoritedPostIds.value.has(postId)
+  }
+  
   function isTogglingUser (userId) {
     return togglingUserIds.value.has(userId)
   }
@@ -46,6 +54,14 @@ export const useFavorite = defineStore('favorite', () => {
   
   function removeTogglingUser (userId) {
     togglingUserIds.value = new Set([...togglingUserIds.value].filter(id => id !== userId))
+  }
+  
+  function addPostFavorite (postId) {
+    favoritedPostIds.value = new Set([...favoritedPostIds.value, postId])
+  }
+  
+  function removePostFavorite (postId) {
+    favoritedPostIds.value = new Set([...favoritedPostIds.value].filter(id => id !== postId))
   }
   
   async function toggleUserFavorite (userId) {
@@ -83,15 +99,42 @@ export const useFavorite = defineStore('favorite', () => {
     }
   }
   
+  async function togglePostFavorite (postId) {
+    const wasFavorited = isPostFavorited(postId)
+    
+    // Optimistic update
+    wasFavorited
+      ? removePostFavorite(postId)
+      : addPostFavorite(postId)
+    
+    try {
+      await (wasFavorited
+          ? $api.delete(`posts/${postId}/favorite`)
+          : $api.post(`posts/${postId}/favorite`)
+      )
+    } catch (e) {
+      // Rollback
+      wasFavorited
+        ? addPostFavorite(postId)
+        : removePostFavorite(postId)
+      
+      throw e
+    }
+  }
+  
   function clear () {
     favoritedUserIds.value = new Set()
+    favoritedPostIds.value = new Set()
   }
 
   return {
     favoritedUserIds: computed(() => Array.from(favoritedUserIds.value)),
+    favoritedPostIds: computed(() => Array.from(favoritedPostIds.value)),
     fetch,
     isUserFavorited,
+    isPostFavorited,
     toggleUserFavorite,
+    togglePostFavorite,
     clear
   }
 })
