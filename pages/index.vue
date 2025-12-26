@@ -18,12 +18,39 @@ if (!user.isGuest && favorite.favoritedUserIds.length === 0) {
 }
 
 const posts = computed(() => postsStore.posts)
+const hasNewPosts = computed(() => postsStore.newPostsAvailable)
+
+// Set up polling for new posts every 30 seconds
+let pollInterval = null
+
+onMounted(() => {
+  pollInterval = setInterval(
+      async () => { await postsStore.checkForNewPosts() },
+      30000,
+  )
+})
+
+onUnmounted(() => {
+  if (pollInterval) {
+    clearInterval(pollInterval)
+  }
+})
+
+function loadNewPosts () {
+  postsStore.loadNewPosts()
+}
 </script>
 
 <template>
   <PostForm
     v-if="!user.isGuest" />
   <div class="grid gap-16">
+    <button
+      v-if="hasNewPosts"
+      class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors mb-4"
+      @click="loadNewPosts">
+      Load New Posts
+    </button>
     <PostItem
       v-for="post in posts"
       :key="post.id"
