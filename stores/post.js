@@ -79,8 +79,19 @@ export const usePosts = defineStore('posts', () => {
     newPostsAvailable.value = false
   }
   
-  async function create ({ title, body }) {
-    const response = await $api.post('posts', { title, body })
+  async function create ({ title, body, image }) {
+    let payload
+    
+    if (image) {
+      payload = new FormData()
+      payload.append('title', title)
+      payload.append('body', body)
+      payload.append('image', image)
+    } else {
+      payload = { title, body }
+    }
+    
+    const response = await $api.post('posts', payload)
     const post = response?.data || response
     
     posts.value.unshift(post)
@@ -95,6 +106,7 @@ export const usePosts = defineStore('posts', () => {
   function clearForm (form) {
     form.title = ''
     form.body = ''
+    form.image = null
   }
 
   async function submitForm (form) {

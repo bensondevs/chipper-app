@@ -7,6 +7,8 @@ export default defineNuxtPlugin(() => {
     const tokenCookie = useCookie('jwt')
     const couponCookie = useCookie('coupon')
     const utmCookie = useCookie('utm')
+    
+    const isFormData = params instanceof FormData
 
     return $fetch(url, {
       method,
@@ -16,7 +18,7 @@ export default defineNuxtPlugin(() => {
       headers: pickBy({
         ...headers,
         Accept: 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': isFormData ? null : 'application/json',
         Authorization: tokenCookie?.value ? `Bearer ${tokenCookie.value}` : null,
         'X-Coupon': couponCookie?.value,
         'X-UTM': JSON.stringify(toRaw(utmCookie?.value))

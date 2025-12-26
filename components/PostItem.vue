@@ -89,6 +89,11 @@ async function togglePostFavorite () {
     <p>
       {{ post.body }}
     </p>
+    <img
+      v-if="post.image"
+      :src="post.image"
+      :alt="post.title"
+      class="w-full h-auto rounded-lg border border-gray-300" />
     <button
       :disabled="isTogglingFavorite"
       :class="[
