@@ -1,4 +1,5 @@
 <script setup>
+
 definePageMeta({
   middleware: ['validate-session', 'require-guest']
 })

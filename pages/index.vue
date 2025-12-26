@@ -3,10 +3,15 @@ definePageMeta({
   middleware: ['validate-session']
 })
 
-const { $api } = useNuxtApp()
 const user = useUser()
+const postsStore = usePosts()
 
-const { data: posts } = await $api.get('posts')
+// Load posts if not already loaded
+if (!postsStore.posts.length) {
+  await postsStore.fetch()
+}
+
+const posts = computed(() => postsStore.posts)
 </script>
 
 <template>
