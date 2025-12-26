@@ -24,6 +24,10 @@ export const useUser = defineStore('user', () => {
 
     // Write cookie
     tokenCookie.value = payload.token
+
+    // Load favorites when user starts session
+    const favorite = useFavorite()
+    await favorite.fetch()
   }
 
   function clear () {
@@ -63,6 +67,10 @@ export const useUser = defineStore('user', () => {
   async function logout () {
     await $api.post('/logout')
     clear()
+    
+    // Clear favorites when logging out
+    const favorite = useFavorite()
+    favorite.clear()
   }
 
   return {
